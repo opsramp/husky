@@ -208,6 +208,165 @@ func TranslateTraceRequest(request *collectorTrace.ExportTraceServiceRequest, ri
 	}, nil
 }
 
+func TranslateTraceReq(request *collectorTrace.ExportTraceServiceRequest, ri RequestInfo) (*TranslateTraceRequestResult, error) {
+
+	/*if err := ri.ValidateTracesHeaders(); err != nil {
+		return nil, err
+	}*/
+	var batches []Batch
+	isLegacy := isLegacy(ri.ApiKey)
+	for _, resourceSpan := range request.ResourceSpans {
+		var events []Event
+		resourceAttrs := make(map[string]interface{})
+		traceAttributes := make(map[string]map[string]interface{})
+
+		if resourceSpan.Resource != nil {
+			addAttributesToMap(traceAttributes["resource.attributes"], resourceSpan.Resource.Attributes)
+		}
+
+		var dataset string
+		if isLegacy {
+			dataset = ri.Dataset
+		} else {
+			if resourceSpan.Resource == nil {
+				dataset = defaultServiceName
+			} else {
+				serviceName, ok := traceAttributes["resource.attributes"]["service.name"].(string)
+				if !ok || serviceName == "" {
+					dataset = defaultServiceName
+				} else {
+					if strings.HasPrefix(serviceName, "unknown_service") {
+						dataset = defaultServiceName
+					} else {
+						dataset = serviceName
+					}
+				}
+			}
+		}
+
+		for _, librarySpan := range resourceSpan.InstrumentationLibrarySpans {
+			library := librarySpan.InstrumentationLibrary
+			if library != nil {
+				if len(library.Name) > 0 {
+					resourceAttrs["library.name"] = library.Name
+				}
+				if len(library.Version) > 0 {
+					resourceAttrs["library.version"] = library.Version
+				}
+			}
+
+			for _, span := range librarySpan.GetSpans() {
+				traceID := BytesToTraceID(span.TraceId)
+				spanID := hex.EncodeToString(span.SpanId)
+
+				spanKind := getSpanKind(span.Kind)
+				eventAttrs := map[string]interface{}{
+					"trace.trace_id":  traceID,
+					"trace.span_id":   spanID,
+					"type":            spanKind,
+					"span.kind":       spanKind,
+					"name":            span.Name,
+					"duration_ms":     float64(span.EndTimeUnixNano-span.StartTimeUnixNano) / float64(time.Millisecond),
+					"status_code":     getSpanStatusCode(span.Status),
+					"span.num_links":  len(span.Links),
+					"span.num_events": len(span.Events),
+				}
+				if span.ParentSpanId != nil {
+					eventAttrs["trace.parent_id"] = hex.EncodeToString(span.ParentSpanId)
+				}
+				if getSpanStatusCode(span.Status) == trace.Status_STATUS_CODE_ERROR {
+					eventAttrs["error"] = true
+				}
+				if span.Status != nil && len(span.Status.Message) > 0 {
+					eventAttrs["status_message"] = span.Status.Message
+				}
+				if span.Attributes != nil {
+					addAttributesToMap(traceAttributes["span.attributes"], span.Attributes)
+				}
+
+				// copy resource attributes to event attributes
+				for k, v := range resourceAttrs {
+					eventAttrs[k] = v
+				}
+
+				//Copy resource attributes
+				for k, v := range traceAttributes["resource.attributes"] {
+					eventAttrs[k] = v
+				}
+
+				//Copy span attributes
+				for k, v := range traceAttributes["span.attributes"] {
+					eventAttrs[k] = v
+				}
+
+				// Now we need to wrap the eventAttrs in an event so we can specify the timestamp
+				// which is the StartTime as a time.Time object
+				timestamp := time.Unix(0, int64(span.StartTimeUnixNano)).UTC()
+				events = append(events, Event{
+					Attributes: eventAttrs,
+					Timestamp:  timestamp,
+					SampleRate: getSampleRate(eventAttrs),
+				})
+
+				for _, sevent := range span.Events {
+					timestamp := time.Unix(0, int64(sevent.TimeUnixNano)).UTC()
+					attrs := map[string]interface{}{
+						"trace.trace_id":       traceID,
+						"trace.parent_id":      spanID,
+						"name":                 sevent.Name,
+						"parent_name":          span.Name,
+						"meta.annotation_type": "span_event",
+					}
+
+					if sevent.Attributes != nil {
+						addAttributesToMap(traceAttributes["span.attributes"], sevent.Attributes)
+					}
+
+					for k, v := range traceAttributes["span.attributes"] {
+						attrs[k] = v
+					}
+
+					events = append(events, Event{
+						Attributes: attrs,
+						Timestamp:  timestamp,
+					})
+				}
+
+				for _, slink := range span.Links {
+					attrs := map[string]interface{}{
+						"trace.trace_id":       traceID,
+						"trace.parent_id":      spanID,
+						"trace.link.trace_id":  BytesToTraceID(slink.TraceId),
+						"trace.link.span_id":   hex.EncodeToString(slink.SpanId),
+						"parent_name":          span.Name,
+						"meta.annotation_type": "link",
+					}
+
+					if slink.Attributes != nil {
+						addAttributesToMap(traceAttributes["span.attributes"], slink.Attributes)
+					}
+					for k, v := range traceAttributes["span.attributes"] {
+						attrs[k] = v
+					}
+					events = append(events, Event{
+						Attributes: attrs,
+						Timestamp:  timestamp, // use timestamp from parent span
+					})
+				}
+			}
+		}
+		batches = append(batches, Batch{
+			Dataset:   dataset,
+			SizeBytes: proto.Size(resourceSpan),
+			Events:    events,
+		})
+	}
+	return &TranslateTraceRequestResult{
+		RequestSize: proto.Size(request),
+		Batches:     batches,
+	}, nil
+}
+
 func getSpanKind(kind trace.Span_SpanKind) string {
 	switch kind {
 	case trace.Span_SPAN_KIND_CLIENT:
