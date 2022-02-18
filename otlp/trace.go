@@ -208,6 +208,17 @@ func TranslateTraceRequest(request *collectorTrace.ExportTraceServiceRequest, ri
 	}, nil
 }
 
+func TranslateTraceReqFromReader(body io.ReadCloser, ri RequestInfo) (*TranslateTraceRequestResult, error) {
+	/*if err := ri.ValidateTracesHeaders(); err != nil {
+		return nil, err
+	}*/
+	request, err := parseOTLPBody(body, ri.ContentEncoding)
+	if err != nil {
+		return nil, ErrFailedParseBody
+	}
+	return TranslateTraceReq(request, ri)
+}
+
 func TranslateTraceReq(request *collectorTrace.ExportTraceServiceRequest, ri RequestInfo) (*TranslateTraceRequestResult, error) {
 
 	/*if err := ri.ValidateTracesHeaders(); err != nil {
