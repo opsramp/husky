@@ -303,14 +303,16 @@ func TranslateTraceReq(request *collectorTrace.ExportTraceServiceRequest, ri Req
 				}
 
 				//Copy resource attributes
-				for k, v := range traceAttributes["resource.attributes"] {
+				/*for k, v := range traceAttributes["resource.attributes"] {
 					eventAttrs[k] = v
-				}
+				}*/
+				eventAttrs["resource.attributes"] = traceAttributes["resource.attributes"]
 
 				//Copy span attributes
-				for k, v := range traceAttributes["span.attributes"] {
+				/*for k, v := range traceAttributes["span.attributes"] {
 					eventAttrs[k] = v
-				}
+				}*/
+				eventAttrs["span.attributes"] = traceAttributes["span.attributes"]
 
 				// Now we need to wrap the eventAttrs in an event so we can specify the timestamp
 				// which is the StartTime as a time.Time object
@@ -335,9 +337,10 @@ func TranslateTraceReq(request *collectorTrace.ExportTraceServiceRequest, ri Req
 						addAttributesToMap(traceAttributes["span.attributes"], sevent.Attributes)
 					}
 
-					for k, v := range traceAttributes["span.attributes"] {
+					/*for k, v := range traceAttributes["span.attributes"] {
 						attrs[k] = v
-					}
+					}*/
+					attrs["span.attributes"] = traceAttributes["span.attributes"]
 
 					events = append(events, Event{
 						Attributes: attrs,
@@ -358,9 +361,10 @@ func TranslateTraceReq(request *collectorTrace.ExportTraceServiceRequest, ri Req
 					if slink.Attributes != nil {
 						addAttributesToMap(traceAttributes["span.attributes"], slink.Attributes)
 					}
-					for k, v := range traceAttributes["span.attributes"] {
+					/*for k, v := range traceAttributes["span.attributes"] {
 						attrs[k] = v
-					}
+					}*/
+					attrs["span.attributes"] = traceAttributes["span.attributes"]
 					events = append(events, Event{
 						Attributes: attrs,
 						Timestamp:  timestamp, // use timestamp from parent span
