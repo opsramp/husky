@@ -230,6 +230,8 @@ func TranslateTraceReq(request *collectorTrace.ExportTraceServiceRequest, ri Req
 		var events []Event
 		resourceAttrs := make(map[string]interface{})
 		traceAttributes := make(map[string]map[string]interface{})
+		traceAttributes["resource.attributes"] = make(map[string]interface{})
+		traceAttributes["span.attributes"] = make(map[string]interface{})
 
 		if resourceSpan.Resource != nil {
 			addAttributesToMap(traceAttributes["resource.attributes"], resourceSpan.Resource.Attributes)
