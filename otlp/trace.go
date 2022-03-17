@@ -224,6 +224,7 @@ func TranslateTraceReq(request *collectorTrace.ExportTraceServiceRequest, ri Req
 	/*if err := ri.ValidateTracesHeaders(); err != nil {
 		return nil, err
 	}*/
+
 	var batches []Batch
 	isLegacy := isLegacy(ri.ApiKey)
 	for _, resourceSpan := range request.ResourceSpans {
@@ -232,6 +233,7 @@ func TranslateTraceReq(request *collectorTrace.ExportTraceServiceRequest, ri Req
 		traceAttributes := make(map[string]map[string]interface{})
 		traceAttributes["resourceAttributes"] = make(map[string]interface{})
 		traceAttributes["spanAttributes"] = make(map[string]interface{})
+		traceAttributes["eventAttributes"] = make(map[string]interface{})
 
 		if resourceSpan.Resource != nil {
 			addAttributesToMap(traceAttributes["resourceAttributes"], resourceSpan.Resource.Attributes)
@@ -282,6 +284,8 @@ func TranslateTraceReq(request *collectorTrace.ExportTraceServiceRequest, ri Req
 					"spanKind":      spanKind,
 					"spanName":      span.Name,
 					"durationMs":    float64(span.EndTimeUnixNano-span.StartTimeUnixNano) / float64(time.Millisecond),
+					"startTime":     int64(span.StartTimeUnixNano),
+					"endTime":       int64(span.EndTimeUnixNano),
 					"statusCode":    getSpanStatusCode(span.Status),
 					"spanNumLinks":  len(span.Links),
 					"spanNumEvents": len(span.Events),
@@ -343,7 +347,7 @@ func TranslateTraceReq(request *collectorTrace.ExportTraceServiceRequest, ri Req
 					/*for k, v := range traceAttributes["spanAttributes"] {
 						attrs[k] = v
 					}*/
-					attrs["spanAttributes"] = traceAttributes["spanAttributes"]
+					attrs["eventAttributes"] = traceAttributes["spanAttributes"]
 
 					events = append(events, Event{
 						Attributes: attrs,

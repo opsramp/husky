@@ -19,6 +19,8 @@ const (
 	contentTypeHeader        = "content-type"
 	contentEncodingHeader    = "content-encoding"
 	gRPCAcceptEncodingHeader = "grpc-accept-encoding"
+	apiTokenHeader           = "authorization"
+	apiTenantId              = "tenantId"
 )
 
 var legacyApiKeyPattern = regexp.MustCompile("^[0-9a-f]{32}$")
@@ -34,6 +36,9 @@ type RequestInfo struct {
 	ContentType        string
 	ContentEncoding    string
 	GRPCAcceptEncoding string
+
+	ApiToken    string
+	ApiTenantId string
 }
 
 // ValidateTracesHeaders validates required headers/metadata for a trace OTLP request
@@ -77,6 +82,8 @@ func GetRequestInfoFromGrpcMetadata(ctx context.Context) RequestInfo {
 		ri.UserAgent = getValueFromMetadata(md, userAgentHeader)
 		ri.ContentEncoding = getValueFromMetadata(md, contentEncodingHeader)
 		ri.GRPCAcceptEncoding = getValueFromMetadata(md, gRPCAcceptEncodingHeader)
+		ri.ApiToken = getValueFromMetadata(md, apiTokenHeader)
+		ri.ApiTenantId = getValueFromMetadata(md, apiTenantId)
 	}
 	return ri
 }
@@ -92,6 +99,8 @@ func GetRequestInfoFromHttpHeaders(header http.Header) RequestInfo {
 		ContentType:        header.Get(contentTypeHeader),
 		ContentEncoding:    header.Get(contentEncodingHeader),
 		GRPCAcceptEncoding: header.Get(gRPCAcceptEncodingHeader),
+		ApiToken:           header.Get(apiTokenHeader),
+		ApiTenantId:        header.Get(apiTenantId),
 	}
 }
 
