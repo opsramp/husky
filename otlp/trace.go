@@ -319,6 +319,15 @@ func TranslateTraceReq(request *collectorTrace.ExportTraceServiceRequest, ri Req
 					eventAttrs[k] = v
 				}*/
 				eventAttrs["spanAttributes"] = traceAttributes["spanAttributes"]
+
+				//Check for event attributes and add them
+				for _, sevent := range span.Events {
+					if sevent.Attributes != nil {
+						addAttributesToMap(traceAttributes["eventAttributes"], sevent.Attributes)
+					}
+				}
+				eventAttrs["eventAttributes"] = traceAttributes["eventAttributes"]
+
 				eventAttrs["time"] = int64(span.StartTimeUnixNano)
 				// Now we need to wrap the eventAttrs in an event so we can specify the timestamp
 				// which is the StartTime as a time.Time object
@@ -329,55 +338,55 @@ func TranslateTraceReq(request *collectorTrace.ExportTraceServiceRequest, ri Req
 					SampleRate: getSampleRate(eventAttrs),
 				})
 
-				for _, sevent := range span.Events {
-					timestamp := time.Unix(0, int64(sevent.TimeUnixNano)).UTC()
-					attrs := map[string]interface{}{
-						"traceTraceID":  traceID,
-						"traceParentID": spanID,
-						"spanName":      sevent.Name,
-						"parentName":    span.Name,
-						"metaType":      "span_event",
-						"time":          int64(sevent.TimeUnixNano),
-					}
+				//for _, sevent := range span.Events {
+				//	timestamp := time.Unix(0, int64(sevent.TimeUnixNano)).UTC()
+				//	attrs := map[string]interface{}{
+				//		"traceTraceID":  traceID,
+				//		"traceParentID": spanID,
+				//		"spanName":      sevent.Name,
+				//		"parentName":    span.Name,
+				//		"metaType":      "span_event",
+				//		"time":          int64(sevent.TimeUnixNano),
+				//	}
+				//
+				//	if sevent.Attributes != nil {
+				//		addAttributesToMap(traceAttributes["spanAttributes"], sevent.Attributes)
+				//	}
+				//
+				//	/*for k, v := range traceAttributes["spanAttributes"] {
+				//		attrs[k] = v
+				//	}*/
+				//	attrs["eventAttributes"] = traceAttributes["spanAttributes"]
+				//
+				//	events = append(events, Event{
+				//		Attributes: attrs,
+				//		Timestamp:  timestamp,
+				//	})
+				//}
 
-					if sevent.Attributes != nil {
-						addAttributesToMap(traceAttributes["spanAttributes"], sevent.Attributes)
-					}
-
-					/*for k, v := range traceAttributes["spanAttributes"] {
-						attrs[k] = v
-					}*/
-					attrs["eventAttributes"] = traceAttributes["spanAttributes"]
-
-					events = append(events, Event{
-						Attributes: attrs,
-						Timestamp:  timestamp,
-					})
-				}
-
-				for _, slink := range span.Links {
-					attrs := map[string]interface{}{
-						"traceTraceID":     traceID,
-						"traceParentID":    spanID,
-						"traceLinkTraceID": BytesToTraceID(slink.TraceId),
-						"traceLinkSpanID":  hex.EncodeToString(slink.SpanId),
-						"parentName":       span.Name,
-						"metaType":         "link",
-					}
-
-					if slink.Attributes != nil {
-						addAttributesToMap(traceAttributes["spanAttributes"], slink.Attributes)
-					}
-					/*for k, v := range traceAttributes["spanAttributes"] {
-						attrs[k] = v
-					}*/
-					attrs["spanAttributes"] = traceAttributes["spanAttributes"]
-					attrs["time"] = int64(span.StartTimeUnixNano)
-					events = append(events, Event{
-						Attributes: attrs,
-						Timestamp:  timestamp, // use timestamp from parent span
-					})
-				}
+				//for _, slink := range span.Links {
+				//	attrs := map[string]interface{}{
+				//		"traceTraceID":     traceID,
+				//		"traceParentID":    spanID,
+				//		"traceLinkTraceID": BytesToTraceID(slink.TraceId),
+				//		"traceLinkSpanID":  hex.EncodeToString(slink.SpanId),
+				//		"parentName":       span.Name,
+				//		"metaType":         "link",
+				//	}
+				//
+				//	if slink.Attributes != nil {
+				//		addAttributesToMap(traceAttributes["spanAttributes"], slink.Attributes)
+				//	}
+				//	/*for k, v := range traceAttributes["spanAttributes"] {
+				//		attrs[k] = v
+				//	}*/
+				//	attrs["spanAttributes"] = traceAttributes["spanAttributes"]
+				//	attrs["time"] = int64(span.StartTimeUnixNano)
+				//	events = append(events, Event{
+				//		Attributes: attrs,
+				//		Timestamp:  timestamp, // use timestamp from parent span
+				//	})
+				//}
 			}
 		}
 		batches = append(batches, Batch{
