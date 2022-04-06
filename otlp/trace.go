@@ -293,9 +293,13 @@ func TranslateTraceReq(request *collectorTrace.ExportTraceServiceRequest, ri Req
 				if span.ParentSpanId != nil {
 					eventAttrs["traceParentID"] = hex.EncodeToString(span.ParentSpanId)
 				}
+
 				if getSpanStatusCode(span.Status) == trace.Status_STATUS_CODE_ERROR {
 					eventAttrs["error"] = true
+				} else {
+					eventAttrs["error"] = false
 				}
+
 				if span.Status != nil && len(span.Status.Message) > 0 {
 					eventAttrs["statusMessage"] = span.Status.Message
 				}
