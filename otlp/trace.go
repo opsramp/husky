@@ -232,8 +232,6 @@ func TranslateTraceReq(request *collectorTrace.ExportTraceServiceRequest, ri Req
 		//resourceAttrs := make(map[string]interface{})
 		traceAttributes := make(map[string]map[string]interface{})
 		traceAttributes["resourceAttributes"] = make(map[string]interface{})
-		traceAttributes["spanAttributes"] = make(map[string]interface{})
-		traceAttributes["eventAttributes"] = make(map[string]interface{})
 
 		if resourceSpan.Resource != nil {
 			addAttributesToMap(traceAttributes["resourceAttributes"], resourceSpan.Resource.Attributes)
@@ -273,6 +271,10 @@ func TranslateTraceReq(request *collectorTrace.ExportTraceServiceRequest, ri Req
 			}
 
 			for _, span := range librarySpan.GetSpans() {
+
+				traceAttributes["spanAttributes"] = make(map[string]interface{})
+				traceAttributes["eventAttributes"] = make(map[string]interface{})
+
 				traceID := BytesToTraceID(span.TraceId)
 				spanID := hex.EncodeToString(span.SpanId)
 
