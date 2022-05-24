@@ -8,7 +8,6 @@ import (
 	"io/ioutil"
 	"math"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/klauspost/compress/zstd"
@@ -25,7 +24,7 @@ const (
 	defaultServiceName = "unknown_service"
 )
 
-// TranslateTraceRequestResult represents an OTLP trace request translated into Honeycomb-friendly structure
+// TranslateTraceRequestResult represents an OTLP trace request translated into Opsramp-friendly structure
 // RequestSize is total byte size of the entire OTLP request
 // Batches represent events grouped by their target dataset
 type TranslateTraceRequestResult struct {
@@ -33,7 +32,7 @@ type TranslateTraceRequestResult struct {
 	Batches     []Batch
 }
 
-// Batch represents Honeycomb events grouped by their target dataset
+// Batch represents Opsramp events grouped by their target dataset
 // SizeBytes is the total byte size of the OTLP structure that represents this batch
 type Batch struct {
 	Dataset   string
@@ -41,14 +40,14 @@ type Batch struct {
 	Events    []Event
 }
 
-// Event represents a single Honeycomb event
+// Event represents a single Opsramp event
 type Event struct {
 	Attributes map[string]interface{}
 	Timestamp  time.Time
 	SampleRate int32
 }
 
-// TranslateTraceRequestFromReader translates an OTLP/HTTP request into Honeycomb-friendly structure
+// TranslateTraceRequestFromReader translates an OTLP/HTTP request into Opsramp-friendly structure
 // RequestInfo is the parsed information from the HTTP headers
 func TranslateTraceRequestFromReader(body io.ReadCloser, ri RequestInfo) (*TranslateTraceRequestResult, error) {
 	if err := ri.ValidateTracesHeaders(); err != nil {
@@ -61,14 +60,14 @@ func TranslateTraceRequestFromReader(body io.ReadCloser, ri RequestInfo) (*Trans
 	return TranslateTraceRequest(request, ri)
 }
 
-// TranslateTraceRequest translates an OTLP/gRPC request into Honeycomb-friendly structure
+// TranslateTraceRequest translates an OTLP/gRPC request into Opsramp-friendly structure
 // RequestInfo is the parsed information from the gRPC metadata
 func TranslateTraceRequest(request *collectorTrace.ExportTraceServiceRequest, ri RequestInfo) (*TranslateTraceRequestResult, error) {
 	if err := ri.ValidateTracesHeaders(); err != nil {
 		return nil, err
 	}
 	var batches []Batch
-	isLegacy := isLegacy(ri.ApiKey)
+	//isLegacy := isLegacy(ri.ApiKey)
 	for _, resourceSpan := range request.ResourceSpans {
 		var events []Event
 		resourceAttrs := make(map[string]interface{})
@@ -78,24 +77,25 @@ func TranslateTraceRequest(request *collectorTrace.ExportTraceServiceRequest, ri
 		}
 
 		var dataset string
-		if isLegacy {
-			dataset = ri.Dataset
-		} else {
-			if resourceSpan.Resource == nil {
-				dataset = defaultServiceName
-			} else {
-				serviceName, ok := resourceAttrs["service.name"].(string)
-				if !ok || serviceName == "" {
-					dataset = defaultServiceName
-				} else {
-					if strings.HasPrefix(serviceName, "unknown_service") {
-						dataset = defaultServiceName
-					} else {
-						dataset = serviceName
-					}
-				}
-			}
-		}
+		dataset = ri.Dataset
+		//if isLegacy {
+		//	dataset = ri.Dataset
+		//} else {
+		//	if resourceSpan.Resource == nil {
+		//		dataset = defaultServiceName
+		//	} else {
+		//		serviceName, ok := resourceAttrs["service.name"].(string)
+		//		if !ok || serviceName == "" {
+		//			dataset = defaultServiceName
+		//		} else {
+		//			if strings.HasPrefix(serviceName, "unknown_service") {
+		//				dataset = defaultServiceName
+		//			} else {
+		//				dataset = serviceName
+		//			}
+		//		}
+		//	}
+		//}
 
 		for _, librarySpan := range resourceSpan.InstrumentationLibrarySpans {
 			library := librarySpan.InstrumentationLibrary
@@ -226,7 +226,7 @@ func TranslateTraceReq(request *collectorTrace.ExportTraceServiceRequest, ri Req
 	}*/
 
 	var batches []Batch
-	isLegacy := isLegacy(ri.ApiKey)
+	//isLegacy := isLegacy(ri.ApiKey)
 	for _, resourceSpan := range request.ResourceSpans {
 		var events []Event
 		//resourceAttrs := make(map[string]interface{})
@@ -238,24 +238,25 @@ func TranslateTraceReq(request *collectorTrace.ExportTraceServiceRequest, ri Req
 		}
 
 		var dataset string
-		if isLegacy {
-			dataset = ri.Dataset
-		} else {
-			if resourceSpan.Resource == nil {
-				dataset = defaultServiceName
-			} else {
-				serviceName, ok := traceAttributes["resourceAttributes"]["service.name"].(string)
-				if !ok || serviceName == "" {
-					dataset = defaultServiceName
-				} else {
-					if strings.HasPrefix(serviceName, "unknown_service") {
-						dataset = defaultServiceName
-					} else {
-						dataset = serviceName
-					}
-				}
-			}
-		}
+		dataset = ri.Dataset
+		//if isLegacy {
+		//	dataset = ri.Dataset
+		//} else {
+		//	if resourceSpan.Resource == nil {
+		//		dataset = defaultServiceName
+		//	} else {
+		//		serviceName, ok := traceAttributes["resourceAttributes"]["service.name"].(string)
+		//		if !ok || serviceName == "" {
+		//			dataset = defaultServiceName
+		//		} else {
+		//			if strings.HasPrefix(serviceName, "unknown_service") {
+		//				dataset = defaultServiceName
+		//			} else {
+		//				dataset = serviceName
+		//			}
+		//		}
+		//	}
+		//}
 
 		for _, librarySpan := range resourceSpan.InstrumentationLibrarySpans {
 			library := librarySpan.InstrumentationLibrary

@@ -11,9 +11,9 @@ import (
 )
 
 const (
-	apiKeyHeader             = "x-honeycomb-team"
-	datasetHeader            = "x-honeycomb-dataset"
-	proxyTokenHeader         = "x-honeycomb-proxy-token"
+	//apiKeyHeader             = "x-opsramp-team"
+	datasetHeader            = "x-opsramp-dataset"
+	proxyTokenHeader         = "x-opsramp-proxy-token"
 	proxyVersionHeader       = "x-basenji-version"
 	userAgentHeader          = "user-agent"
 	contentTypeHeader        = "content-type"
@@ -27,7 +27,7 @@ var legacyApiKeyPattern = regexp.MustCompile("^[0-9a-f]{32}$")
 
 // RequestInfo represents information parsed from either HTTP headers or gRPC metadata
 type RequestInfo struct {
-	ApiKey       string
+	//ApiKey       string
 	Dataset      string
 	ProxyToken   string
 	ProxyVersion string
@@ -43,10 +43,10 @@ type RequestInfo struct {
 
 // ValidateTracesHeaders validates required headers/metadata for a trace OTLP request
 func (ri *RequestInfo) ValidateTracesHeaders() error {
-	if len(ri.ApiKey) == 0 {
-		return ErrMissingAPIKeyHeader
-	}
-	if isLegacy(ri.ApiKey) && len(ri.Dataset) == 0 {
+	//if len(ri.ApiKey) == 0 {
+	//	return ErrMissingAPIKeyHeader
+	//}
+	if  len(ri.Dataset) == 0 {
 		return ErrMissingDatasetHeader
 	}
 	if ri.ContentType != "application/protobuf" && ri.ContentType != "application/x-protobuf" {
@@ -57,9 +57,9 @@ func (ri *RequestInfo) ValidateTracesHeaders() error {
 
 // ValidateMetricsHeaders validates required headers/metadata for a metric OTLP request
 func (ri *RequestInfo) ValidateMetricsHeaders() error {
-	if len(ri.ApiKey) == 0 {
-		return ErrMissingAPIKeyHeader
-	}
+	//if len(ri.ApiKey) == 0 {
+	//	return ErrMissingAPIKeyHeader
+	//}
 	if len(ri.Dataset) == 0 {
 		return ErrMissingDatasetHeader
 	}
@@ -75,7 +75,7 @@ func GetRequestInfoFromGrpcMetadata(ctx context.Context) RequestInfo {
 		ContentType: "application/protobuf",
 	}
 	if md, ok := metadata.FromIncomingContext(ctx); ok {
-		ri.ApiKey = getValueFromMetadata(md, apiKeyHeader)
+		//ri.ApiKey = getValueFromMetadata(md, apiKeyHeader)
 		ri.Dataset = getValueFromMetadata(md, datasetHeader)
 		ri.ProxyToken = getValueFromMetadata(md, proxyTokenHeader)
 		ri.ProxyVersion = getValueFromMetadata(md, proxyVersionHeader)
@@ -91,7 +91,7 @@ func GetRequestInfoFromGrpcMetadata(ctx context.Context) RequestInfo {
 // GetRequestInfoFromHttpHeaders parses relevant incoming HTTP headers
 func GetRequestInfoFromHttpHeaders(header http.Header) RequestInfo {
 	return RequestInfo{
-		ApiKey:             header.Get(apiKeyHeader),
+		//ApiKey:             header.Get(apiKeyHeader),
 		Dataset:            header.Get(datasetHeader),
 		ProxyToken:         header.Get(proxyTokenHeader),
 		ProxyVersion:       header.Get(proxyVersionHeader),
