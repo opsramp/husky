@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"compress/gzip"
 	"encoding/hex"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"math"
@@ -243,6 +244,7 @@ func TranslateTraceReq(request *collectorTrace.ExportTraceServiceRequest, ri Req
 		if ri.Dataset != ""{
 			dataset = ri.Dataset
 		} else {
+			fmt.Println("no dataset so default one choosing")
 			if resourceSpan.Resource == nil {
 				dataset = defaultServiceName
 			} else {
