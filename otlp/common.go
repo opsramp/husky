@@ -3,11 +3,9 @@ package otlp
 import (
 	"context"
 	"encoding/json"
-	"net/http"
-	"regexp"
-
 	common "go.opentelemetry.io/proto/otlp/common/v1"
 	"google.golang.org/grpc/metadata"
+	"net/http"
 )
 
 const (
@@ -23,7 +21,7 @@ const (
 	apiTenantId              = "tenantId"
 )
 
-var legacyApiKeyPattern = regexp.MustCompile("^[0-9a-f]{32}$")
+//var legacyApiKeyPattern = regexp.MustCompile("^[0-9a-f]{32}$")
 
 // RequestInfo represents information parsed from either HTTP headers or gRPC metadata
 type RequestInfo struct {
@@ -42,32 +40,32 @@ type RequestInfo struct {
 }
 
 // ValidateTracesHeaders validates required headers/metadata for a trace OTLP request
-func (ri *RequestInfo) ValidateTracesHeaders() error {
-	//if len(ri.ApiKey) == 0 {
-	//	return ErrMissingAPIKeyHeader
-	//}
-	if  len(ri.Dataset) == 0 {
-		return ErrMissingDatasetHeader
-	}
-	if ri.ContentType != "application/protobuf" && ri.ContentType != "application/x-protobuf" {
-		return ErrInvalidContentType
-	}
-	return nil
-}
+//func (ri *RequestInfo) ValidateTracesHeaders() error {
+//	//if len(ri.ApiKey) == 0 {
+//	//	return ErrMissingAPIKeyHeader
+//	//}
+//	if  len(ri.Dataset) == 0 {
+//		return ErrMissingDatasetHeader
+//	}
+//	if ri.ContentType != "application/protobuf" && ri.ContentType != "application/x-protobuf" {
+//		return ErrInvalidContentType
+//	}
+//	return nil
+//}
 
 // ValidateMetricsHeaders validates required headers/metadata for a metric OTLP request
-func (ri *RequestInfo) ValidateMetricsHeaders() error {
-	//if len(ri.ApiKey) == 0 {
-	//	return ErrMissingAPIKeyHeader
-	//}
-	if len(ri.Dataset) == 0 {
-		return ErrMissingDatasetHeader
-	}
-	if ri.ContentType != "application/protobuf" && ri.ContentType != "application/x-protobuf" {
-		return ErrInvalidContentType
-	}
-	return nil
-}
+//func (ri *RequestInfo) ValidateMetricsHeaders() error {
+//	//if len(ri.ApiKey) == 0 {
+//	//	return ErrMissingAPIKeyHeader
+//	//}
+//	if len(ri.Dataset) == 0 {
+//		return ErrMissingDatasetHeader
+//	}
+//	if ri.ContentType != "application/protobuf" && ri.ContentType != "application/x-protobuf" {
+//		return ErrInvalidContentType
+//	}
+//	return nil
+//}
 
 // GetRequestInfoFromGrpcMetadata parses relevant gRPC metadata from an incoming request context
 func GetRequestInfoFromGrpcMetadata(ctx context.Context) RequestInfo {
@@ -159,6 +157,6 @@ func getValue(value *common.AnyValue) interface{} {
 	return nil
 }
 
-func isLegacy(apiKey string) bool {
-	return legacyApiKeyPattern.MatchString(apiKey)
-}
+//func isLegacy(apiKey string) bool {
+//	return legacyApiKeyPattern.MatchString(apiKey)
+//}

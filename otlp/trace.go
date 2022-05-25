@@ -9,7 +9,6 @@ import (
 	"io/ioutil"
 	"math"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/klauspost/compress/zstd"
@@ -242,31 +241,31 @@ func TranslateTraceReq(request *collectorTrace.ExportTraceServiceRequest, ri Req
 		}
 
 		var dataset string
-		//dataset = ri.Dataset
-		if ri.Dataset != ""{
-			dataset = ri.Dataset
-			fmt.Println("dataset is",dataset+ "and"+ ri.Dataset)
-		} else {
-			fmt.Println("no dataset so default one choosing")
-			if resourceSpan.Resource == nil {
-				dataset = defaultServiceName
-				fmt.Println("dataset is",defaultServiceName)
-			} else {
-				serviceName, ok := traceAttributes["resourceAttributes"]["service.name"].(string)
-				if !ok || serviceName == "" {
-					dataset = defaultServiceName
-					fmt.Println("service name not got",dataset,defaultServiceName)
-				} else {
-					if strings.HasPrefix(serviceName, "unknown_service") {
-						fmt.Println("service name got with prefix",serviceName,defaultServiceName)
-						dataset = defaultServiceName
-					} else {
-						dataset = serviceName
-						fmt.Println("service name got",dataset)
-					}
-				}
-			}
-		}
+		dataset = ri.Dataset
+		//if ri.Dataset != ""{
+		//	dataset = ri.Dataset
+		//	fmt.Println("dataset is",dataset+ "and"+ ri.Dataset)
+		//} else {
+		//	fmt.Println("no dataset so default one choosing")
+		//	if resourceSpan.Resource == nil {
+		//		dataset = defaultServiceName
+		//		fmt.Println("dataset is",defaultServiceName)
+		//	} else {
+		//		serviceName, ok := traceAttributes["resourceAttributes"]["service.name"].(string)
+		//		if !ok || serviceName == "" {
+		//			dataset = defaultServiceName
+		//			fmt.Println("service name not got",dataset,defaultServiceName)
+		//		} else {
+		//			if strings.HasPrefix(serviceName, "unknown_service") {
+		//				fmt.Println("service name got with prefix",serviceName,defaultServiceName)
+		//				dataset = defaultServiceName
+		//			} else {
+		//				dataset = serviceName
+		//				fmt.Println("service name got",dataset)
+		//			}
+		//		}
+		//	}
+		//}
 
 		for _, librarySpan := range resourceSpan.InstrumentationLibrarySpans {
 			library := librarySpan.InstrumentationLibrary
