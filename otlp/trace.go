@@ -250,15 +250,19 @@ func TranslateTraceReq(request *collectorTrace.ExportTraceServiceRequest, ri Req
 			fmt.Println("no dataset so default one choosing")
 			if resourceSpan.Resource == nil {
 				dataset = defaultServiceName
+				fmt.Println("dataset is",defaultServiceName)
 			} else {
 				serviceName, ok := traceAttributes["resourceAttributes"]["service.name"].(string)
 				if !ok || serviceName == "" {
 					dataset = defaultServiceName
+					fmt.Println("service name not got",dataset,defaultServiceName)
 				} else {
 					if strings.HasPrefix(serviceName, "unknown_service") {
+						fmt.Println("service name got with prefix",serviceName,defaultServiceName)
 						dataset = defaultServiceName
 					} else {
 						dataset = serviceName
+						fmt.Println("service name got",dataset)
 					}
 				}
 			}
