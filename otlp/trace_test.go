@@ -31,7 +31,7 @@ func TestTranslateLegacyGrpcTraceRequest(t *testing.T) {
 	linkedSpanID := test.RandomBytes(8)
 
 	ri := RequestInfo{
-		ApiKey:      "a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1",
+		//ApiKey:      "a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1",
 		Dataset:     "legacy-dataset",
 		ContentType: "application/protobuf",
 	}
