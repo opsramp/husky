@@ -11,12 +11,12 @@ import (
 const (
 	//apiKeyHeader             = "x-opsramp-team"
 	datasetHeader            = "x-opsramp-dataset"
-	proxyTokenHeader         = "x-opsramp-proxy-token"
-	proxyVersionHeader       = "x-basenji-version"
-	userAgentHeader          = "user-agent"
+	//proxyTokenHeader         = "x-opsramp-proxy-token"
+	//proxyVersionHeader       = "x-basenji-version"
+	//userAgentHeader          = "user-agent"
 	contentTypeHeader        = "content-type"
-	contentEncodingHeader    = "content-encoding"
-	gRPCAcceptEncodingHeader = "grpc-accept-encoding"
+	//contentEncodingHeader    = "content-encoding"
+	//gRPCAcceptEncodingHeader = "grpc-accept-encoding"
 	apiTokenHeader           = "authorization"
 	apiTenantId              = "tenantId"
 )
@@ -27,13 +27,13 @@ const (
 type RequestInfo struct {
 	//ApiKey       string
 	Dataset      string
-	ProxyToken   string
-	ProxyVersion string
-
-	UserAgent          string
+	//ProxyToken   string
+	//ProxyVersion string
+	//
+	//UserAgent          string
 	ContentType        string
 	ContentEncoding    string
-	GRPCAcceptEncoding string
+	//GRPCAcceptEncoding string
 
 	ApiToken    string
 	ApiTenantId string
@@ -75,11 +75,11 @@ func GetRequestInfoFromGrpcMetadata(ctx context.Context) RequestInfo {
 	if md, ok := metadata.FromIncomingContext(ctx); ok {
 		//ri.ApiKey = getValueFromMetadata(md, apiKeyHeader)
 		ri.Dataset = getValueFromMetadata(md, datasetHeader)
-		ri.ProxyToken = getValueFromMetadata(md, proxyTokenHeader)
-		ri.ProxyVersion = getValueFromMetadata(md, proxyVersionHeader)
-		ri.UserAgent = getValueFromMetadata(md, userAgentHeader)
-		ri.ContentEncoding = getValueFromMetadata(md, contentEncodingHeader)
-		ri.GRPCAcceptEncoding = getValueFromMetadata(md, gRPCAcceptEncodingHeader)
+		//ri.ProxyToken = getValueFromMetadata(md, proxyTokenHeader)
+		//ri.ProxyVersion = getValueFromMetadata(md, proxyVersionHeader)
+		//ri.UserAgent = getValueFromMetadata(md, userAgentHeader)
+	//	ri.ContentEncoding = getValueFromMetadata(md, contentEncodingHeader)
+		//ri.GRPCAcceptEncoding = getValueFromMetadata(md, gRPCAcceptEncodingHeader)
 		ri.ApiToken = getValueFromMetadata(md, apiTokenHeader)
 		ri.ApiTenantId = getValueFromMetadata(md, apiTenantId)
 	}
@@ -91,12 +91,12 @@ func GetRequestInfoFromHttpHeaders(header http.Header) RequestInfo {
 	return RequestInfo{
 		//ApiKey:             header.Get(apiKeyHeader),
 		Dataset:            header.Get(datasetHeader),
-		ProxyToken:         header.Get(proxyTokenHeader),
-		ProxyVersion:       header.Get(proxyVersionHeader),
-		UserAgent:          header.Get(userAgentHeader),
+		//ProxyToken:         header.Get(proxyTokenHeader),
+		//ProxyVersion:       header.Get(proxyVersionHeader),
+		//UserAgent:          header.Get(userAgentHeader),
 		ContentType:        header.Get(contentTypeHeader),
-		ContentEncoding:    header.Get(contentEncodingHeader),
-		GRPCAcceptEncoding: header.Get(gRPCAcceptEncodingHeader),
+		//ContentEncoding:    header.Get(contentEncodingHeader),
+		//GRPCAcceptEncoding: header.Get(gRPCAcceptEncodingHeader),
 		ApiToken:           header.Get(apiTokenHeader),
 		ApiTenantId:        header.Get(apiTenantId),
 	}
