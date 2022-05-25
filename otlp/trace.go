@@ -214,6 +214,7 @@ func TranslateTraceReqFromReader(body io.ReadCloser, ri RequestInfo) (*Translate
 	/*if err := ri.ValidateTracesHeaders(); err != nil {
 		return nil, err
 	}*/
+	fmt.Println("inside TranslateTraceReqFromReader")
 	request, err := parseOTLPBody(body, ri.ContentEncoding)
 	if err != nil {
 		return nil, ErrFailedParseBody
@@ -229,6 +230,7 @@ func TranslateTraceReq(request *collectorTrace.ExportTraceServiceRequest, ri Req
 
 	var batches []Batch
 	//isLegacy := isLegacy(ri.ApiKey)
+	fmt.Println("inside TranslateTraceReq")
 	for _, resourceSpan := range request.ResourceSpans {
 		var events []Event
 		//resourceAttrs := make(map[string]interface{})
