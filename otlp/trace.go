@@ -243,6 +243,7 @@ func TranslateTraceReq(request *collectorTrace.ExportTraceServiceRequest, ri Req
 		//dataset = ri.Dataset
 		if ri.Dataset != ""{
 			dataset = ri.Dataset
+			fmt.Println("dataset is",dataset+ "and"+ ri.Dataset)
 		} else {
 			fmt.Println("no dataset so default one choosing")
 			if resourceSpan.Resource == nil {
