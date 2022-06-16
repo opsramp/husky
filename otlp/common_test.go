@@ -12,7 +12,7 @@ import (
 
 func TestParseGrpcMetadataIntoRequestInfo(t *testing.T) {
 	ctx := metadata.NewIncomingContext(context.Background(), metadata.New(map[string]string{
-		apiKeyHeader:       "test-api-key",
+	//	apiKeyHeader:       "test-api-key",
 		datasetHeader:      "test-dataset",
 		proxyTokenHeader:   "test-proxy-token",
 		proxyVersionHeader: "test-proxy-version",
@@ -20,7 +20,7 @@ func TestParseGrpcMetadataIntoRequestInfo(t *testing.T) {
 	}))
 	ri := GetRequestInfoFromGrpcMetadata(ctx)
 
-	assert.Equal(t, "test-api-key", ri.ApiKey)
+	//assert.Equal(t, "test-api-key", ri.ApiKey)
 	assert.Equal(t, "test-dataset", ri.Dataset)
 	assert.Equal(t, "test-proxy-token", ri.ProxyToken)
 	assert.Equal(t, "test-proxy-version", ri.ProxyVersion)
@@ -30,14 +30,14 @@ func TestParseGrpcMetadataIntoRequestInfo(t *testing.T) {
 
 func TestParseHttpHeadersIntoRequestInfo(t *testing.T) {
 	header := http.Header{}
-	header.Set(apiKeyHeader, "test-api-key")
+	//header.Set(apiKeyHeader, "test-api-key")
 	header.Set(datasetHeader, "test-dataset")
 	header.Set(proxyTokenHeader, "test-proxy-token")
 	header.Set(userAgentHeader, "test-user-agent")
 	header.Set(contentTypeHeader, "test-content-type")
 
 	ri := GetRequestInfoFromHttpHeaders(header)
-	assert.Equal(t, "test-api-key", ri.ApiKey)
+	//assert.Equal(t, "test-api-key", ri.ApiKey)
 	assert.Equal(t, "test-dataset", ri.Dataset)
 	assert.Equal(t, "test-proxy-token", ri.ProxyToken)
 	assert.Equal(t, "test-user-agent", ri.UserAgent)
@@ -123,61 +123,61 @@ func TestAddAttributesToMap(t *testing.T) {
 	}
 }
 
-func TestValidateTracesHeaders(t *testing.T) {
-	testCases := []struct {
-		apikey      string
-		dataset     string
-		contentType string
-		err         error
-	}{
-		{apikey: "", dataset: "", contentType: "", err: ErrMissingAPIKeyHeader},
-		{apikey: "a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1", dataset: "", contentType: "", err: ErrMissingDatasetHeader},
-		{apikey: "abc123DEF456ghi789jklm", dataset: "", contentType: "application/protobuf", err: nil},
-		{apikey: "", dataset: "dataset", contentType: "", err: ErrMissingAPIKeyHeader},
-		{apikey: "apikey", dataset: "dataset", contentType: "", err: ErrInvalidContentType},
-		{apikey: "apikey", dataset: "dataset", contentType: "application/json", err: ErrInvalidContentType},
-		{apikey: "apikey", dataset: "dataset", contentType: "application/javascript", err: ErrInvalidContentType},
-		{apikey: "apikey", dataset: "dataset", contentType: "application/xml", err: ErrInvalidContentType},
-		{apikey: "apikey", dataset: "dataset", contentType: "application/octet-stream", err: ErrInvalidContentType},
-		{apikey: "apikey", dataset: "dataset", contentType: "text-plain", err: ErrInvalidContentType},
-		{apikey: "apikey", dataset: "dataset", contentType: "application/protobuf", err: nil},
-		{apikey: "apikey", dataset: "dataset", contentType: "application/x-protobuf", err: nil},
-	}
-
-	for _, tc := range testCases {
-		ri := RequestInfo{ApiKey: tc.apikey, ContentType: tc.contentType, Dataset: tc.dataset}
-		err := ri.ValidateTracesHeaders()
-		assert.Equal(t, tc.err, err)
-	}
-}
-
-func TestValidateMetricsHeaders(t *testing.T) {
-	testCases := []struct {
-		apikey      string
-		dataset     string
-		contentType string
-		err         error
-	}{
-		{apikey: "", dataset: "", contentType: "", err: ErrMissingAPIKeyHeader},
-		{apikey: "a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1", dataset: "", contentType: "", err: ErrMissingDatasetHeader},
-		{apikey: "abc123DEF456ghi789jklm", dataset: "", contentType: "", err: ErrMissingDatasetHeader},
-		{apikey: "", dataset: "dataset", contentType: "", err: ErrMissingAPIKeyHeader},
-		{apikey: "apikey", dataset: "dataset", contentType: "", err: ErrInvalidContentType},
-		{apikey: "apikey", dataset: "dataset", contentType: "application/json", err: ErrInvalidContentType},
-		{apikey: "apikey", dataset: "dataset", contentType: "application/javascript", err: ErrInvalidContentType},
-		{apikey: "apikey", dataset: "dataset", contentType: "application/xml", err: ErrInvalidContentType},
-		{apikey: "apikey", dataset: "dataset", contentType: "application/octet-stream", err: ErrInvalidContentType},
-		{apikey: "apikey", dataset: "dataset", contentType: "text-plain", err: ErrInvalidContentType},
-		{apikey: "apikey", dataset: "dataset", contentType: "application/protobuf", err: nil},
-		{apikey: "apikey", dataset: "dataset", contentType: "application/x-protobuf", err: nil},
-	}
-
-	for _, tc := range testCases {
-		ri := RequestInfo{ApiKey: tc.apikey, ContentType: tc.contentType, Dataset: tc.dataset}
-		err := ri.ValidateMetricsHeaders()
-		assert.Equal(t, tc.err, err)
-	}
-}
+//func TestValidateTracesHeaders(t *testing.T) {
+//	testCases := []struct {
+//		apikey      string
+//		dataset     string
+//		contentType string
+//		err         error
+//	}{
+//		//{apikey: "", dataset: "", contentType: "", err: ErrMissingAPIKeyHeader},
+//		{apikey: "a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1", dataset: "", contentType: "", err: ErrMissingDatasetHeader},
+//		{apikey: "abc123DEF456ghi789jklm", dataset: "", contentType: "application/protobuf", err: nil},
+//		//{apikey: "", dataset: "dataset", contentType: "", err: ErrMissingAPIKeyHeader},
+//		{apikey: "apikey", dataset: "dataset", contentType: "", err: ErrInvalidContentType},
+//		{apikey: "apikey", dataset: "dataset", contentType: "application/json", err: ErrInvalidContentType},
+//		{apikey: "apikey", dataset: "dataset", contentType: "application/javascript", err: ErrInvalidContentType},
+//		{apikey: "apikey", dataset: "dataset", contentType: "application/xml", err: ErrInvalidContentType},
+//		{apikey: "apikey", dataset: "dataset", contentType: "application/octet-stream", err: ErrInvalidContentType},
+//		{apikey: "apikey", dataset: "dataset", contentType: "text-plain", err: ErrInvalidContentType},
+//		{apikey: "apikey", dataset: "dataset", contentType: "application/protobuf", err: nil},
+//		{apikey: "apikey", dataset: "dataset", contentType: "application/x-protobuf", err: nil},
+//	}
+//
+//	for _, tc := range testCases {
+//		ri := RequestInfo{ ContentType: tc.contentType, Dataset: tc.dataset}
+//		err := ri.ValidateTracesHeaders()
+//		assert.Equal(t, tc.err, err)
+//	}
+//}
+//
+//func TestValidateMetricsHeaders(t *testing.T) {
+//	testCases := []struct {
+//		apikey      string
+//		dataset     string
+//		contentType string
+//		err         error
+//	}{
+//		{apikey: "", dataset: "", contentType: "", err: ErrMissingAPIKeyHeader},
+//		{apikey: "a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1", dataset: "", contentType: "", err: ErrMissingDatasetHeader},
+//		{apikey: "abc123DEF456ghi789jklm", dataset: "", contentType: "", err: ErrMissingDatasetHeader},
+//		{apikey: "", dataset: "dataset", contentType: "", err: ErrMissingAPIKeyHeader},
+//		{apikey: "apikey", dataset: "dataset", contentType: "", err: ErrInvalidContentType},
+//		{apikey: "apikey", dataset: "dataset", contentType: "application/json", err: ErrInvalidContentType},
+//		{apikey: "apikey", dataset: "dataset", contentType: "application/javascript", err: ErrInvalidContentType},
+//		{apikey: "apikey", dataset: "dataset", contentType: "application/xml", err: ErrInvalidContentType},
+//		{apikey: "apikey", dataset: "dataset", contentType: "application/octet-stream", err: ErrInvalidContentType},
+//		{apikey: "apikey", dataset: "dataset", contentType: "text-plain", err: ErrInvalidContentType},
+//		{apikey: "apikey", dataset: "dataset", contentType: "application/protobuf", err: nil},
+//		{apikey: "apikey", dataset: "dataset", contentType: "application/x-protobuf", err: nil},
+//	}
+//
+//	for _, tc := range testCases {
+//		ri := RequestInfo{ApiKey: tc.apikey, ContentType: tc.contentType, Dataset: tc.dataset}
+//		err := ri.ValidateMetricsHeaders()
+//		assert.Equal(t, tc.err, err)
+//	}
+//}
 
 func TestGetRequestInfoFromGrpcMetadataIsCaseInsensitive(t *testing.T) {
 	const (
@@ -194,21 +194,21 @@ func TestGetRequestInfoFromGrpcMetadataIsCaseInsensitive(t *testing.T) {
 	}{
 		{
 			name:             "lowercase",
-			apikeyHeader:     "x-honeycomb-team",
-			datasetHeader:    "x-honeycomb-dataset",
-			proxyTokenHeader: "x-honeycomb-proxy-token",
+			apikeyHeader:     "x-opsramp-team",
+			datasetHeader:    "x-opsramp-dataset",
+			proxyTokenHeader: "x-opsramp-proxy-token",
 		},
 		{
 			name:             "uppercase",
-			apikeyHeader:     "X-HONEYCOMB-TEAM",
-			datasetHeader:    "X-HONEYCOMB-DATASET",
-			proxyTokenHeader: "X-HONEYCOMB-PROXY-TOKEN",
+			apikeyHeader:     "X-OPSRAMP-TEAM",
+			datasetHeader:    "X-OPSRAMP-DATASET",
+			proxyTokenHeader: "X-OPSRAMP-PROXY-TOKEN",
 		},
 		{
 			name:             "mixed-case",
-			apikeyHeader:     "x-HoNeYcOmB-tEaM",
-			datasetHeader:    "X-hOnEyCoMb-DaTaSeT",
-			proxyTokenHeader: "X-hOnEyCoMb-PrOxY-tOKeN",
+			apikeyHeader:     "x-OpSrAmP-tEaM",
+			datasetHeader:    "X-OpSrAmP-DaTaSeT",
+			proxyTokenHeader: "X-OpSrAmP-PrOxY-tOKeN",
 		},
 	}
 
@@ -221,7 +221,7 @@ func TestGetRequestInfoFromGrpcMetadataIsCaseInsensitive(t *testing.T) {
 
 			ctx := metadata.NewIncomingContext(context.Background(), md)
 			ri := GetRequestInfoFromGrpcMetadata(ctx)
-			assert.Equal(t, apiKeyValue, ri.ApiKey)
+		//	assert.Equal(t, apiKeyValue, ri.ApiKey)
 			assert.Equal(t, datasetValue, ri.Dataset)
 			assert.Equal(t, proxyTokenValue, ri.ProxyToken)
 		})
@@ -243,33 +243,33 @@ func TestGetRequestInfoFromHttpHeadersIsCaseInsensitive(t *testing.T) {
 	}{
 		{
 			name:             "lowercase",
-			apikeyHeader:     "x-honeycomb-team",
-			datasetHeader:    "x-honeycomb-dataset",
-			proxyTokenHeader: "x-honeycomb-proxy-token",
+			apikeyHeader:     "x-opsramp-team",
+			datasetHeader:    "x-opsramp-dataset",
+			proxyTokenHeader: "x-opsramp-proxy-token",
 		},
 		{
 			name:             "uppercase",
-			apikeyHeader:     "X-HONEYCOMB-TEAM",
-			datasetHeader:    "X-HONEYCOMB-DATASET",
-			proxyTokenHeader: "X-HONEYCOMB-PROXY-TOKEN",
+			apikeyHeader:     "X-OPSRAMP-TEAM",
+			datasetHeader:    "X-OPSRAMP-DATASET",
+			proxyTokenHeader: "X-OPSRAMP-PROXY-TOKEN",
 		},
 		{
 			name:             "mixed-case",
-			apikeyHeader:     "x-HoNeYcOmB-tEaM",
-			datasetHeader:    "X-hOnEyCoMb-DaTaSeT",
-			proxyTokenHeader: "X-hOnEyCoMb-PrOxY-tOKeN",
+			apikeyHeader:     "x-OpSrAmP-tEaM",
+			datasetHeader:    "X-OpSrAmP-DaTaSeT",
+			proxyTokenHeader: "X-OpSrAmP-PrOxY-tOKeN",
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			header := http.Header{}
-			header.Set(apiKeyHeader, apiKeyValue)
+		//	header.Set(apiKeyHeader, apiKeyValue)
 			header.Set(datasetHeader, datasetValue)
 			header.Set(proxyTokenHeader, proxyTokenValue)
 
 			ri := GetRequestInfoFromHttpHeaders(header)
-			assert.Equal(t, apiKeyValue, ri.ApiKey)
+		//	assert.Equal(t, apiKeyValue, ri.ApiKey)
 			assert.Equal(t, datasetValue, ri.Dataset)
 			assert.Equal(t, proxyTokenValue, ri.ProxyToken)
 		})
