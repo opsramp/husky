@@ -11,7 +11,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/honeycombio/husky/test"
+	"github.com/opsramp/husky/test"
 	"github.com/klauspost/compress/zstd"
 	"github.com/stretchr/testify/assert"
 	collectortrace "go.opentelemetry.io/proto/otlp/collector/trace/v1"
