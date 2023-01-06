@@ -147,6 +147,14 @@ func (ri RequestInfo) hasLegacyKey() bool {
 //	return nil
 //}
 
+// ValidateLogsHeaders validates required headers/metadata for a logs OTLP request
+func (ri *RequestInfo) ValidateLogsHeaders() error {
+	if !IsContentTypeSupported(ri.ContentType) {
+		return ErrInvalidContentType
+	}
+	return nil
+}
+
 // GetRequestInfoFromGrpcMetadata parses relevant gRPC metadata from an incoming request context
 func GetRequestInfoFromGrpcMetadata(ctx context.Context) RequestInfo {
 	ri := RequestInfo{
