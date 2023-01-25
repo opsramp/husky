@@ -2,7 +2,6 @@ package otlp
 
 import (
 	"encoding/hex"
-	"fmt"
 	"io"
 	"math"
 	"strconv"
@@ -49,7 +48,6 @@ func TranslateTraceRequest(request *collectorTrace.ExportTraceServiceRequest, ri
 
 	var batches []Batch
 	//isLegacy := isLegacy(ri.ApiKey)
-	fmt.Println("inside TranslateTraceReq")
 	for _, resourceSpan := range request.ResourceSpans {
 		var events []Event
 		resourceAttrs := getResourceAttributes(resourceSpan.Resource)
