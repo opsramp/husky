@@ -22,13 +22,12 @@ import (
 )
 
 const (
-	//apiKeyHeader             = "x-opsramp-team"
 	datasetHeader = "x-opsramp-dataset"
 	//proxyTokenHeader         = "x-opsramp-proxy-token"
 	//proxyVersionHeader       = "x-basenji-version"
 	//userAgentHeader          = "user-agent"
-	contentTypeHeader = "content-type"
-	//contentEncodingHeader    = "content-encoding"
+	contentTypeHeader     = "content-type"
+	contentEncodingHeader = "content-encoding"
 	//gRPCAcceptEncodingHeader = "grpc-accept-encoding"
 	apiTokenHeader     = "authorization"
 	apiTenantId        = "tenantId"
@@ -176,17 +175,17 @@ func GetRequestInfoFromGrpcMetadata(ctx context.Context) RequestInfo {
 
 // GetRequestInfoFromHttpHeaders parses relevant incoming HTTP headers
 func GetRequestInfoFromHttpHeaders(header http.Header) RequestInfo {
+	ds := header.Get(datasetHeader)
+	if ds == "" {
+		ds = "ds"
+	}
+
 	return RequestInfo{
-		//ApiKey:             header.Get(apiKeyHeader),
-		Dataset: header.Get(datasetHeader),
-		//ProxyToken:         header.Get(proxyTokenHeader),
-		//ProxyVersion:       header.Get(proxyVersionHeader),
-		//UserAgent:          header.Get(userAgentHeader),
-		ContentType: header.Get(contentTypeHeader),
-		//ContentEncoding:    header.Get(contentEncodingHeader),
-		//GRPCAcceptEncoding: header.Get(gRPCAcceptEncodingHeader),
-		ApiToken:    header.Get(apiTokenHeader),
-		ApiTenantId: header.Get(apiTenantId),
+		Dataset:         ds,
+		ContentType:     header.Get(contentTypeHeader),
+		ContentEncoding: header.Get(contentEncodingHeader),
+		ApiToken:        header.Get(apiTokenHeader),
+		ApiTenantId:     header.Get(apiTenantId),
 	}
 }
 
