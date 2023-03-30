@@ -22,17 +22,13 @@ import (
 )
 
 const (
-	datasetHeader = "x-opsramp-dataset"
-	//proxyTokenHeader         = "x-opsramp-proxy-token"
-	//proxyVersionHeader       = "x-basenji-version"
-	//userAgentHeader          = "user-agent"
+	datasetHeader         = "x-opsramp-dataset"
 	contentTypeHeader     = "content-type"
 	contentEncodingHeader = "content-encoding"
-	//gRPCAcceptEncodingHeader = "grpc-accept-encoding"
-	apiTokenHeader     = "authorization"
-	apiTenantId        = "tenantId"
-	defaultServiceName = "unknown_service"
-	unknownLogSource   = "unknown_log_source"
+	apiTokenHeader        = "authorization"
+	apiTenantId           = "tenantId"
+	defaultServiceName    = "unknown_service"
+	unknownLogSource      = "unknown_log_source"
 )
 
 // var legacyApiKeyPattern = regexp.MustCompile("^[0-9a-f]{32}$")
@@ -100,15 +96,10 @@ type Event struct {
 
 // RequestInfo represents information parsed from either HTTP headers or gRPC metadata
 type RequestInfo struct {
-	//ApiKey       string
-	Dataset string
-	//ProxyToken   string
-	//ProxyVersion string
-	//
-	//UserAgent          string
-	ContentType     string
-	ContentEncoding string
-	//GRPCAcceptEncoding string
+	Dataset            string
+	ContentType        string
+	ContentEncoding    string
+	GRPCAcceptEncoding string
 
 	ApiToken    string
 	ApiTenantId string
@@ -117,34 +108,6 @@ type RequestInfo struct {
 func (ri RequestInfo) hasLegacyKey() bool {
 	return true
 }
-
-// ValidateTracesHeaders validates required headers/metadata for a trace OTLP request
-//func (ri *RequestInfo) ValidateTracesHeaders() error {
-//	//if len(ri.ApiKey) == 0 {
-//	//	return ErrMissingAPIKeyHeader
-//	//}
-//	if  len(ri.Dataset) == 0 {
-//		return ErrMissingDatasetHeader
-//	}
-//	if ri.ContentType != "application/protobuf" && ri.ContentType != "application/x-protobuf" {
-//		return ErrInvalidContentType
-//	}
-//	return nil
-//}
-
-// ValidateMetricsHeaders validates required headers/metadata for a metric OTLP request
-//func (ri *RequestInfo) ValidateMetricsHeaders() error {
-//	//if len(ri.ApiKey) == 0 {
-//	//	return ErrMissingAPIKeyHeader
-//	//}
-//	if len(ri.Dataset) == 0 {
-//		return ErrMissingDatasetHeader
-//	}
-//	if ri.ContentType != "application/protobuf" && ri.ContentType != "application/x-protobuf" {
-//		return ErrInvalidContentType
-//	}
-//	return nil
-//}
 
 // ValidateLogsHeaders validates required headers/metadata for a logs OTLP request
 func (ri *RequestInfo) ValidateLogsHeaders() error {
@@ -160,13 +123,7 @@ func GetRequestInfoFromGrpcMetadata(ctx context.Context) RequestInfo {
 		ContentType: "application/protobuf",
 	}
 	if md, ok := metadata.FromIncomingContext(ctx); ok {
-		//ri.ApiKey = getValueFromMetadata(md, apiKeyHeader)
 		ri.Dataset = getValueFromMetadata(md, datasetHeader)
-		//ri.ProxyToken = getValueFromMetadata(md, proxyTokenHeader)
-		//ri.ProxyVersion = getValueFromMetadata(md, proxyVersionHeader)
-		//ri.UserAgent = getValueFromMetadata(md, userAgentHeader)
-		//	ri.ContentEncoding = getValueFromMetadata(md, contentEncodingHeader)
-		//ri.GRPCAcceptEncoding = getValueFromMetadata(md, gRPCAcceptEncodingHeader)
 		ri.ApiToken = getValueFromMetadata(md, apiTokenHeader)
 		ri.ApiTenantId = getValueFromMetadata(md, apiTenantId)
 	}
@@ -175,13 +132,8 @@ func GetRequestInfoFromGrpcMetadata(ctx context.Context) RequestInfo {
 
 // GetRequestInfoFromHttpHeaders parses relevant incoming HTTP headers
 func GetRequestInfoFromHttpHeaders(header http.Header) RequestInfo {
-	ds := header.Get(datasetHeader)
-	if ds == "" {
-		ds = "ds"
-	}
-
 	return RequestInfo{
-		Dataset:         ds,
+		Dataset:         header.Get(datasetHeader),
 		ContentType:     header.Get(contentTypeHeader),
 		ContentEncoding: header.Get(contentEncodingHeader),
 		ApiToken:        header.Get(apiTokenHeader),
@@ -408,7 +360,3 @@ func parseOtlpRequestBody(body io.ReadCloser, contentType string, contentEncodin
 
 	return nil
 }
-
-//func isLegacy(apiKey string) bool {
-//	return legacyApiKeyPattern.MatchString(apiKey)
-//}

@@ -37,7 +37,7 @@ func TranslateTraceRequestFromReader(body io.ReadCloser, ri RequestInfo) (*Trans
 	return TranslateTraceRequest(request, ri)
 }
 
-// TranslateTraceRequest translates an OTLP/gRPC request into Honeycomb-friendly structure
+// TranslateTraceRequest translates an OTLP/gRPC request into OpsRamp-friendly structure
 // RequestInfo is the parsed information from the gRPC metadata
 func TranslateTraceRequest(request *collectorTrace.ExportTraceServiceRequest, ri RequestInfo) (*TranslateOTLPRequestResult, error) {
 	var batches []Batch
@@ -94,11 +94,7 @@ func TranslateTraceRequest(request *collectorTrace.ExportTraceServiceRequest, ri
 					eventAttrs["traceParentID"] = hex.EncodeToString(span.ParentSpanId)
 				}
 
-				if isError {
-					eventAttrs["error"] = true
-				} else {
-					eventAttrs["error"] = false
-				}
+				eventAttrs["error"] = isError
 
 				if span.Status != nil && len(span.Status.Message) > 0 {
 					eventAttrs["statusMessage"] = span.Status.Message
