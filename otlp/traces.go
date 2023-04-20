@@ -95,6 +95,9 @@ func TranslateTraceRequest(request *collectorTrace.ExportTraceServiceRequest, ri
 				}
 
 				eventAttrs["error"] = isError
+				if isError {
+					traceAttributes["resourceAttributes"]["error"] = isError
+				}
 
 				if span.Status != nil && len(span.Status.Message) > 0 {
 					eventAttrs["statusMessage"] = span.Status.Message
