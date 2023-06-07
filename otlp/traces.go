@@ -17,6 +17,7 @@ const (
 	traceIDShortLength = 8
 	traceIDLongLength  = 16
 	defaultSampleRate  = int32(1)
+	UnknownService     = "unknown_service"
 )
 
 // TranslateTraceRequestResult represents an OTLP trace request translated into Opsramp-friendly structure
@@ -51,6 +52,10 @@ func TranslateTraceRequest(request *collectorTrace.ExportTraceServiceRequest, ri
 
 		if resourceSpan.Resource != nil {
 			addAttributesToMap(traceAttributes["resourceAttributes"], resourceSpan.Resource.Attributes)
+		}
+
+		if _, ok := traceAttributes["resourceAttributes"]["service_name"]; !ok {
+			traceAttributes["resourceAttributes"]["service_name"] = UnknownService
 		}
 
 		for _, librarySpan := range resourceSpan.ScopeSpans {
