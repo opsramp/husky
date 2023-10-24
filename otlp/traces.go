@@ -49,8 +49,12 @@ func TranslateTraceRequest(request *collectorTrace.ExportTraceServiceRequest, ri
 		traceAttributes := make(map[string]map[string]interface{})
 		traceAttributes["resourceAttributes"] = make(map[string]interface{})
 
+		// trying to classify the spans based on resource attributes
+		_classificationAttributes := map[string]string{}
+
 		if resourceSpan.Resource != nil {
 			addAttributesToMap(traceAttributes["resourceAttributes"], resourceSpan.Resource.Attributes)
+			_classificationAttributes = DetermineClassification(resourceSpan.GetResource().GetAttributes())
 		}
 
 		for _, librarySpan := range resourceSpan.ScopeSpans {
@@ -63,6 +67,12 @@ func TranslateTraceRequest(request *collectorTrace.ExportTraceServiceRequest, ri
 				if len(library.Version) > 0 {
 					traceAttributes["resourceAttributes"]["library.version"] = library.Version
 				}
+			}
+
+			// update classification attrs with scope attributes
+			_scopeClassificationAttrs := _classificationAttributes
+			if librarySpan.GetScope() != nil {
+				_scopeClassificationAttrs = NormalizeClassification(_classificationAttributes, librarySpan.GetScope().GetAttributes())
 			}
 
 			for _, span := range librarySpan.GetSpans() {
@@ -110,8 +120,16 @@ func TranslateTraceRequest(request *collectorTrace.ExportTraceServiceRequest, ri
 				for k, v := range scopeAttrs {
 					eventAttrs[k] = v
 				}
+
+				// update scope classification attrs with span attributes
+				_spanClassificationAttrs := _scopeClassificationAttrs
 				if span.Attributes != nil {
 					addAttributesToMap(traceAttributes["spanAttributes"], span.Attributes)
+					_spanClassificationAttrs = NormalizeClassification(_scopeClassificationAttrs, span.GetAttributes())
+
+					for k, v := range _spanClassificationAttrs {
+						traceAttributes["spanAttributes"][k] = v
+					}
 				}
 
 				// get sample rate after resource and scope attributes have been added
