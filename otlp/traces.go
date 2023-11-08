@@ -122,10 +122,9 @@ func TranslateTraceRequest(request *collectorTrace.ExportTraceServiceRequest, ri
 				}
 
 				// update scope classification attrs with span attributes
-				_spanClassificationAttrs := _scopeClassificationAttrs
 				if span.Attributes != nil {
 					addAttributesToMap(traceAttributes["spanAttributes"], span.Attributes)
-					_spanClassificationAttrs = NormalizeClassification(_scopeClassificationAttrs, span.GetAttributes())
+					_spanClassificationAttrs := NormalizeClassification(_scopeClassificationAttrs, span.GetAttributes())
 
 					for k, v := range _spanClassificationAttrs {
 						traceAttributes["spanAttributes"][k] = v

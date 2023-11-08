@@ -23,13 +23,13 @@ func TranslateLogsRequestFromReader(body io.ReadCloser, ri RequestInfo) (*Transl
 	return TranslateLogsRequest(request, ri)
 }
 
-// TranslateLogsRequest translates an OTLP proto log request into Honeycomb-friendly structure
+// TranslateLogsRequest translates an OTEL proto log request into Tracing Proxy friendly structure
 // RequestInfo is the parsed information from the gRPC metadata
 func TranslateLogsRequest(request *collectorLogs.ExportLogsServiceRequest, ri RequestInfo) (*TranslateOTLPRequestResult, error) {
 	if err := ri.ValidateLogsHeaders(); err != nil {
 		return nil, err
 	}
-	batches := []Batch{}
+	var batches []Batch
 	for _, resourceLog := range request.ResourceLogs {
 		var events []Event
 		resourceAttrs := getResourceAttributes(resourceLog.Resource)
