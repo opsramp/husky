@@ -11,6 +11,7 @@ const (
 	_nonWebTransaction     = "non-web"
 	TransactionCategory    = "transaction.category"
 	TransactionSubCategory = "transaction.sub_category"
+	Language               = "language"
 )
 
 var (
@@ -37,10 +38,12 @@ func NormalizeClassification(m map[string]string, args ...[]*v11.KeyValue) map[s
 	existingSpanType := m[TransactionType]
 	existingSpanCategory := m[TransactionCategory]
 	existingSpanSubCategory := m[TransactionSubCategory]
+	existingLanguage := m[Language]
 
 	newSpanType := _classification[TransactionType]
 	newSpanCategory := _classification[TransactionCategory]
 	newSpanSubCategory := _classification[TransactionSubCategory]
+	newLanguage := m[Language]
 
 	if existingSpanType == _webTransaction {
 		newSpanType = _webTransaction
@@ -49,11 +52,15 @@ func NormalizeClassification(m map[string]string, args ...[]*v11.KeyValue) map[s
 		newSpanCategory = existingSpanCategory
 		newSpanSubCategory = existingSpanSubCategory
 	}
+	if newLanguage == "" {
+		newLanguage = existingLanguage
+	}
 
 	return map[string]string{
 		TransactionType:        newSpanType,
 		TransactionCategory:    newSpanCategory,
 		TransactionSubCategory: newSpanSubCategory,
+		Language:               newLanguage,
 	}
 }
 
@@ -62,6 +69,7 @@ func DetermineClassification(args ...[]*v11.KeyValue) map[string]string {
 	spanType := _nonWebTransaction
 	spanCategory := "unknown"
 	spanSubCategory := "unknown"
+	language := "unknown"
 
 	attributes := map[string]string{}
 
@@ -87,9 +95,15 @@ func DetermineClassification(args ...[]*v11.KeyValue) map[string]string {
 		}
 	}
 
+	// set sdk lang
+	if val, ok := attributes["telemetry.sdk.language"]; ok {
+		language = val
+	}
+
 	return map[string]string{
 		TransactionType:        spanType,
 		TransactionCategory:    spanCategory,
 		TransactionSubCategory: spanSubCategory,
+		Language:               language,
 	}
 }
