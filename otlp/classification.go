@@ -12,6 +12,7 @@ const (
 	TransactionCategory    = "transaction.category"
 	TransactionSubCategory = "transaction.sub_category"
 	Language               = "language"
+	_unknown               = "unknown"
 )
 
 var (
@@ -48,11 +49,11 @@ func NormalizeClassification(m map[string]string, args ...[]*v11.KeyValue) map[s
 	if existingSpanType == _webTransaction {
 		newSpanType = _webTransaction
 	}
-	if newSpanCategory == "" {
+	if newSpanCategory == _unknown || newSpanCategory == "" {
 		newSpanCategory = existingSpanCategory
 		newSpanSubCategory = existingSpanSubCategory
 	}
-	if newLanguage == "" {
+	if newLanguage == _unknown || newLanguage == "" {
 		newLanguage = existingLanguage
 	}
 
@@ -67,9 +68,9 @@ func NormalizeClassification(m map[string]string, args ...[]*v11.KeyValue) map[s
 // DetermineClassification returns a map of labels classifying the type of the span based on the predefined attributes in the span
 func DetermineClassification(args ...[]*v11.KeyValue) map[string]string {
 	spanType := _nonWebTransaction
-	spanCategory := "unknown"
-	spanSubCategory := "unknown"
-	language := "unknown"
+	spanCategory := _unknown
+	spanSubCategory := _unknown
+	language := _unknown
 
 	attributes := map[string]string{}
 
