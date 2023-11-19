@@ -7,7 +7,6 @@ import (
 	"io"
 	"math"
 	"net/http"
-	"regexp"
 	"strings"
 	"time"
 
@@ -37,7 +36,6 @@ const (
 const fieldSizeMax = math.MaxUint16
 
 var (
-	legacyApiKeyPattern = regexp.MustCompile("^[0-9a-f]{32}$")
 	// Incoming OpenTelemetry HTTP Content-Types (e.g. "application/protobuf") we support
 	supportedContentTypes = []string{
 		"application/protobuf",
